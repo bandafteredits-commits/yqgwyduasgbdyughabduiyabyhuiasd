@@ -1,0 +1,20 @@
+name: build
+on: [push, workflow_dispatch]
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+      - name: Build DLL
+        run: cl /nologo /O2 /GL /MT /EHsc /LD cpoldcrit.cpp /link /OUT:cpoldcrit.dll
+      - name: Build injector
+        run: cl /nologo /O2 /MT /EHsc cpoldcrit_inject.cpp /link /OUT:cpoldcrit_inject.exe advapi32.lib
+      - uses: actions/upload-artifact@v4
+        with:
+          name: oldcrit
+          path: |
+            cpoldcrit.dll
+            cpoldcrit_inject.exe
